@@ -75,8 +75,9 @@ bool ClientProcessingEngine::sendIndexRequest(const IndexRequest& request) {
         bytesSent += result;
     }
     // std::cout << "bytesSent: " << bytesSent << std::endl;
-    // Receive reply data with handling for partial receives
-    char buffer[10240] = {0};  // Increased buffer size
+
+
+    char buffer[10240] = {0}; 
     ssize_t bytesReceived = recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
     if (bytesReceived < 0) {
         std::cerr << "Error receiving reply data: " << strerror(errno) << std::endl;
@@ -151,26 +152,25 @@ IndexResult ClientProcessingEngine::indexFolder(std::string folderPath) {
         }
     };
 
-    // Create worker threads
     for (int i = 0; i < 6; i++) {
         threads.emplace_back(worker);
     }
 
-    // Notify threads that work is done
+    // Notify threads when work is done
     {
         std::lock_guard<std::mutex> lock(fileQueueMutex);
         isDone = true;
     }
     cv.notify_all();
 
-    // Join threads
+    // Joining threads
     for (auto& thread : threads) {
         thread.join();
     }
 
     auto indexingStopTime = std::chrono::steady_clock::now();
     result.executionTime = std::chrono::duration_cast<std::chrono::seconds>(indexingStopTime - indexingStartTime).count();
-    // std::cout << "result :" << result.executionTime << " " << result.totalBytesRead << std::endl;
+
     usleep(50000);
     return result;
 }
@@ -208,15 +208,11 @@ void ClientProcessingEngine::removeClientFromMap(int clientSocket) {
     auto itr = clientMap.find(clientSocket);
     if (itr != clientMap.end()) {
         clientMap.erase(itr);
-    } else {
-        // std::cerr << "Client with socket " << clientSocket << " not found in the map." << std::endl;
     }
 }
 
 void ClientProcessingEngine::disconnect() {
-    // TO-DO implement disconnect from server ✅
-    // TO-DO send a QUIT message to the server ✅
-    // close the TCP/IP socket ✅
+
     std::string quitMessage = "QUIT";
     int32_t messageLength = htonl(quitMessage.size());              
     send(clientSocket, &messageLength, sizeof(messageLength), 0);   
@@ -248,7 +244,7 @@ SearchResult ClientProcessingEngine::sendMessageAndReceiveResponse(const std::st
     ssize_t bytesSent = send(clientSocket, buffer, sizeof(messageSize) + prefixedMessage.size(), 0);
     if (bytesSent < 0) {
         std::cerr << "Error sending message: " << strerror(errno) << std::endl;
-        return {}; // Handle send failure
+        return {}; 
     }
 
     // Receive the response size first
@@ -261,9 +257,10 @@ SearchResult ClientProcessingEngine::sendMessageAndReceiveResponse(const std::st
 
 
 
-    responseSize = ntohl(responseSize); // Convert response size from network byte order
+    responseSize = ntohl(responseSize); // Converting response size from network byte order
 
 
+    // If no docs found return empty object
     if (!responseSize) {
         return {}; 
     }
@@ -272,7 +269,7 @@ SearchResult ClientProcessingEngine::sendMessageAndReceiveResponse(const std::st
     bytesReceived = recv(clientSocket, &response[0], responseSize, 0);
     if (bytesReceived < 0) {
         std::cerr << "Error receiving response data: " << strerror(errno) << std::endl;
-        return {}; // Handle receive failure
+        return {}; 
     }
 
 
@@ -282,7 +279,7 @@ SearchResult ClientProcessingEngine::sendMessageAndReceiveResponse(const std::st
         std::cerr << "Received response size: " << response.size() << std::endl;
         std::cerr << "Response content: " << response << std::endl; // Inspect the raw response
         std::cerr << "Failed to parse SearchReply." << std::endl;
-        return {}; // Handle parsing failure
+        return {};
     }
 
     SearchResult result;
@@ -302,36 +299,35 @@ SearchResult ClientProcessingEngine::sendMessageAndReceiveResponse(const std::st
 
 
 SearchResult ClientProcessingEngine::search(std::vector<std::string> terms) {
-    SearchResult result = {0.0, {}}; // Initialize result with execution time and empty document frequencies
+    SearchResult result = {0.0, {}}; 
 
-    // Get the start time for execution time calculation
+
     auto searchStartTime = std::chrono::steady_clock::now();
 
-    // Prepare the SEARCH REQUEST message
+
     SearchRequest request;
     for (const auto& term : terms) {
-        request.add_terms(term); // Add each term to the request
+        request.add_terms(term); 
     }
 
-    // Serialize the SEARCH REQUEST to a string
+
     std::string serializedRequest;
     if (!request.SerializeToString(&serializedRequest)) {
         std::cerr << "Failed to serialize SearchRequest." << std::endl;
-        return result; // Return default result if serialization fails
+        return result; 
     }
 
-    // Send the message and receive the response
-    result = sendMessageAndReceiveResponse(serializedRequest); // Store the result directly from the response
 
-    // Check if the result indicates an error or empty response
+    result = sendMessageAndReceiveResponse(serializedRequest); 
+
+
     if (result.documentFrequencies.empty() && result.executionTime == 0.0) {
-        // std::cerr << "No response received from the server or response parsing failed." << std::endl;
-        return result; // Return default result if no response
+        return result; 
     }
 
-    // Get the stop time and calculate the execution time
+
     auto searchStopTime = std::chrono::steady_clock::now();
     result.executionTime = std::chrono::duration_cast<std::chrono::seconds>(searchStopTime - searchStartTime).count();
 
-    return result; // Return the populated SearchResult
+    return result;
 }

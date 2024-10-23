@@ -6,14 +6,14 @@
 #include <unordered_map>
 #include <mutex>
 
-// Data structure that stores a document number and the number of time a word/term appears in the document
+
 struct DocFreqPair {
     long documentNumber;
     long wordFrequency;
 };
 
 struct DocumentInfo {
-    std::string docPath;  // Path to the document
+    std::string docPath;  
     std::string origin;   // Client name (origin)
 };
 

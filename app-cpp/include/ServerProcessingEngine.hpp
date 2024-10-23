@@ -22,18 +22,10 @@ struct ClientInfo {
 
 class ServerProcessingEngine {
     std::shared_ptr<IndexStore> store;
-    // TO-DO keep track of the Dispatcher thread
-    // TO-DO keep track of the Index Worker threads
-    // TO-DO keep track of the clients information
-    // struct clientInformation {
-    //     std::string clientID;
-    //     std::string clientIP;
-    //     int port;
-    // };
+
     std::thread dispatcherThread;
     std::vector<std::thread> workerThreads;
-    // std::unordered_map<int, clientInformation> clients;
-    std::atomic<bool> termination{false};
+
     int serverSocket;
     std::vector<ClientInfo> connectedClients;
     std::string clientName;

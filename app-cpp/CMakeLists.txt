@@ -8,16 +8,14 @@ project(file-retrieval-engine
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-# Find the Protobuf package
 find_package(Protobuf REQUIRED)
 
-# Specify the path to your .proto files
+
 set(PROTO_FILES ./serverMessages.proto)
 
-# Generate C++ files from the .proto files
+
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
 
-# Include directories for generated protobuf files
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 
@@ -46,7 +44,7 @@ add_executable(file-retrieval-server
 
 target_include_directories(file-retrieval-server PUBLIC include)
 
-# Link protobuf library to the targets
+
 target_link_libraries(file-retrieval-client PRIVATE ${Protobuf_LIBRARIES})
 target_link_libraries(file-retrieval-benchmark PRIVATE ${Protobuf_LIBRARIES})
 target_link_libraries(file-retrieval-server PRIVATE ${Protobuf_LIBRARIES})

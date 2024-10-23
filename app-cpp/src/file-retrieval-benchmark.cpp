@@ -10,10 +10,9 @@
 
 void runWorker(ClientProcessingEngine &client, const std::string &datasetPath, long &totalBytesIndexed)
 {
-    // Index the dataset using the provided client
+
     auto result = client.indexFolder(datasetPath);
 
-    // Update total bytes indexed
     totalBytesIndexed = result.totalBytesRead;
 }
 
@@ -37,7 +36,7 @@ void performSearch(ClientProcessingEngine &client, const std::string &query)
         }
         searchTerms.push_back(modifiedQuery);  
     } else {
-        searchTerms.push_back(query);  // Single term search
+        searchTerms.push_back(query);  
     }
 
     // Perform the search
@@ -66,30 +65,28 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    // Extract arguments from command line
+
     std::string serverIP = argv[1];
     std::string serverPort = argv[2];
     int numberOfClients = std::stoi(argv[3]);
 
-    // Collect client dataset paths
+
     std::vector<std::string> clientsDatasetPath;
     for (int i = 4; i < argc; ++i) {
         clientsDatasetPath.push_back(argv[i]);
     }
 
-    // Check if number of datasets matches number of clients
     if (clientsDatasetPath.size() != numberOfClients) {
         std::cerr << "Error: Number of client datasets does not match the number of clients." << std::endl;
         return 1;
     }
 
-    // Start measuring the execution time
+
     auto startTime = std::chrono::high_resolution_clock::now();
 
-    // Create a vector of client processing engines
+
     std::vector<ClientProcessingEngine> clients(numberOfClients);
 
-    // Create and connect clients to the server
     for (int i = 0; i < numberOfClients; ++i) {
         if (!clients[i].connectToServer(serverIP, serverPort)) {
             std::cerr << "Error: Failed to connect client " << i + 1 << " to the server." << std::endl;
@@ -97,16 +94,14 @@ int main(int argc, char **argv)
         }
     }
 
-    // Track total bytes indexed
+
     std::vector<long> totalBytesIndexed(numberOfClients, 0);
 
-    // Starting worker threads for each client
     std::vector<std::thread> workers;
     for (int i = 0; i < numberOfClients; ++i) {
         workers.emplace_back(runWorker, std::ref(clients[i]), std::ref(clientsDatasetPath[i]), std::ref(totalBytesIndexed[i]));
     }
 
-    // Joining the benchmark worker threads
     for (auto &worker : workers) {
         worker.join();
     }

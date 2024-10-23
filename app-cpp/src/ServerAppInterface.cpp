@@ -11,10 +11,11 @@ void ServerAppInterface::readCommands() {
     std::string command;
     
     while (true) {
-        std::cout << "> ";
+        std::cout << "> <list | quit>  ";
         
         // read from command line
         std::getline(std::cin, command);
+
 
         // if the command is quit, terminate the program       
         if (command == "quit") {
@@ -23,13 +24,21 @@ void ServerAppInterface::readCommands() {
         }
 
         // if the command begins with list, list all the connected clients
-        if (command.size() >= 4 && command.substr(0, 4) == "list") {
+        else if (command.size() >= 4 && command.substr(0, 4) == "list") {
             // TO-DO call the getConnectedClients method from the server to retrieve the clients information
             // TO-DO print the clients information
             std::vector<std::string> clientsInformation = engine->getConnectedClients();
-            continue;
+            if (clientsInformation.empty()) {
+                std::cout << "No clients connected." << std::endl;
+            } else {
+                for (const std::string &clientInfo : clientsInformation) {
+                    std::cout << clientInfo << std::endl;
+                }
+            }
+        } else {
+        std::cout << "unrecognized command!" << std::endl;
+
         }
 
-        std::cout << "unrecognized command!" << std::endl;
     }
 }

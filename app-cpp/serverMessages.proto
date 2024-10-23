@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+message IndexRequest {
+    string client_id = 1;                 
+    string document_path = 2;             
+    map<string, int32> word_frequencies = 3;
+}
+
+message IndexReply {
+    string status = 1;                   
+    int64 document_number = 2;            
+}
+
+message SearchRequest {
+    repeated string terms = 1;            
+    repeated string logical_operators = 2; 
+}
+
+message SearchReply {
+    repeated Document documents = 1;       
+    int32 total_results = 2;               
+    double execution_time = 3;             
+
+    message Document {
+        string document_path = 1;          
+        int32 frequency = 2;               
+        string client_id = 3;
+    }
+}
+
+message ServerMessage {
+    enum MessageType {
+        INDEX_REQUEST = 0;                 
+        SEARCH_REQUEST = 1;                
+        INDEX_REPLY = 2;                   
+        SEARCH_REPLY = 3;                  
+        QUIT = 4;                          
+    }
+
+    MessageType type = 1;                  
+    IndexRequest index_request = 2;        
+    SearchRequest search_request = 3;      
+    IndexReply index_reply = 4;            
+    SearchReply search_reply = 5;          
+}

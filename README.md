@@ -1,11 +1,4 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/Cajoc9es)
-## CSC 435 Programming Assignment 4 (Fall 2024)
-**Jarvis College of Computing and Digital Media - DePaul University**
-
-**Student**: Reyna Royce (Email: rroyce@depaul.edu)  
-**Solution programming language**: C++
-
-## What This Program Does
+## What This Project Does
 
 
 This project implements a multithreaded file retrieval engine that indexes text files in an input folder and performs search operations over the indexed data. The program operates on a Client-Server Architecture with multiple clients simultaneosly where only the client has access to the dataset and sends over a partial index to the server to search operations. The program supports the following features:

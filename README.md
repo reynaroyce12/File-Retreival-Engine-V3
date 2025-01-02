@@ -9,6 +9,10 @@ This project implements a multithreaded file retrieval engine that indexes text 
 - Searching for terms within indexed files, supporting both single-term queries and AND-based multiple term queries.
 - Displays the time taken for indexing and search operations, along with the total bytes read.
 
+### Enhancements in This Version Over the Previous One (V2):
+
+This version introduces a multithreaded client-server architecture improving scalability and performance. Unlike the previous iteration, which operated on a single machine, this version allows multiple clients to independently index and search files. Each client manages its dataset and sends partial indexes to the server for querying. The system now supports simultaneous indexing and searching across multiple clients.
+
 #### A Few Points to Consider:
 
 - Server can be started by running the executable passing the port as the command line argument

@@ -27,7 +27,7 @@ This version introduces a multithreaded client-server architecture improving sca
     - Folder does not exists
     - No folder path specifid
     - Missing search terms
-- The program uses Google protocol buffer for encoding and transmitting data. 
+- The program uses Google Protocol Buffers for encoding and transmitting data and POSIX Sockets for client-server communication.
 
 #### The program also assumes that your enviroment already has the following installed and configured:
 
